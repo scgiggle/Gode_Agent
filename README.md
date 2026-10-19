@@ -115,7 +115,7 @@ $env:GODE_PERSONAL_NOTES_ENABLED = 'true'
 
 ### 4. 构建并启动后端
 
-先安装本项目公共依赖，再启动后端。
+先在 `gode-wrench` 目录执行 `mvn clean install -DskipTests`，将公共依赖打包为 JAR 并安装到本地 Maven 仓库，再运行 `gode-server` 的启动类 `com.gode.Application`。
 
 ### 5. 加载侧边栏插件
 
