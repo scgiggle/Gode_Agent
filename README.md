@@ -36,6 +36,7 @@ Gode 将 AI 对话、代码检查、错题复盘和练习推荐放在力扣网�
 gode/
 ├─ .gitignore                # Git 忽略规则
 ├─ README.md                 # 项目介绍与使用说明
+├─ LICENSE                   # PolyForm Noncommercial 1.0.0 许可证
 ├─ gode-leetcode-sidepanel/   # 浏览器侧边栏插件，当前主要使用入口
 ├─ gode-server/               # Java 后端，负责模型调用、工具编排和数据保存
 │  ├─ gode-server-app/        # Spring Boot 启动入口、配置及测试
@@ -135,6 +136,12 @@ $env:GODE_PERSONAL_NOTES_ENABLED = 'true'
 - **模型回答需要结合实际运行检查。** 应用代码前先阅读修改内容，运行和提交仍由你在力扣页面操作。
 - **保留插件存储。** 当前用户 ID 由插件生成并保存在本地；清空存储或重装后可能生成新 ID，旧聊天和错题不会自动关联到新 ID。
 - **删除前确认。** 删除聊天不会删除错题或长期记忆；删除错题会同时删除该题复盘，相关聊天保留。
+
+## 许可证
+
+本项目采用 [PolyForm Noncommercial 1.0.0](LICENSE) 许可证，允许许可证规定的非商业用途使用、修改和分发。商业用途需另行取得作者授权，具体权限与限制以许可证全文为准。第三方依赖遵循各自的许可证。
+
+Required Notice: Copyright 2026 scgiggle
 
 ## 学习项目说明
 
