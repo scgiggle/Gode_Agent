@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gode AI</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">G</span>
+          <div>
+            <strong>Gode AI</strong>
+            <small id="connection-status">正在连接当前题目…</small>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="refresh-button" class="icon-button" title="重新读取当前题目">↻</button>
+          <button id="settings-button" class="icon-button" title="设置">⚙</button>
+        </div>
+      </header>
+
+      <nav class="workspace-tabs" aria-label="功能页面">
+        <button id="chat-tab" class="workspace-tab active" type="button">对话</button>
+        <button id="mistake-book-tab" class="workspace-tab" type="button">
+          错题本 <span id="mistake-book-count" class="tab-count">—</span>
+        </button>
+      </nav>
+
+      <section id="submission-review-banner" class="submission-review-banner hidden" aria-live="polite"></section>
+
+      <section id="problem-card" class="problem-card hidden">
+        <div>
+          <span id="problem-number" class="problem-number"></span>
+          <strong id="problem-title"></strong>
+        </div>
+        <div class="problem-meta">
+          <span id="problem-difficulty"></span>
+          <span id="problem-tags"></span>
+        </div>
+      </section>
+
+      <section id="empty-state" class="empty-state hidden">
+        <strong>请先打开一道力扣题目</strong>
+        <p>侧边栏会自动识别当前 <code>leetcode.cn/problems/...</code> 页面。</p>
+      </section>
+
+      <section id="settings-panel" class="settings-panel hidden">
+        <div class="settings-title">
+          <strong>连接设置</strong>
+          <button id="close-settings" class="icon-button">×</button>
+        </div>
+        <label>
+          后端地址
+          <input id="api-base-url" type="url" spellcheck="false" />
+        </label>
+        <label>
+          Agent ID
+          <input id="agent-id" type="text" spellcheck="false" />
+        </label>
+        <button id="save-settings" class="primary-button">保存设置</button>
+        <p class="settings-tip">API Key 仍保存在 gode-server，不会写入插件。</p>
+        <div class="notes-settings">
+          <strong>力扣笔记</strong>
+          <label>
+            LEETCODE_SESSION Cookie
+            <input id="leetcode-session-cookie" type="password" autocomplete="off" spellcheck="false"
+              placeholder="填写力扣中国站的 Cookie 值" />
+          </label>
+          <div class="notes-settings-actions">
+            <button id="save-notes-cookie" class="primary-button" type="button">保存并验证</button>
+            <button id="clear-notes-cookie" class="text-button" type="button">清除配置</button>
+          </div>
+          <p id="notes-cookie-status" class="settings-tip" role="status" aria-live="polite">尚未检查笔记登录配置</p>
+        </div>
+      </section>
+
+      <section id="mistake-book" class="mistake-book hidden" aria-label="错题本">
+        <div class="mistake-toolbar">
+          <button id="mistake-add-current" type="button">＋ 添加当前题</button>
+          <button id="mistake-refresh" type="button">刷新</button>
+        </div>
+        <div id="mistake-notice" class="mistake-notice hidden" role="status"></div>
+        <label class="mistake-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="mistake-search-input" type="search" placeholder="搜索题目、标签或错误原因" autocomplete="off" />
+        </label>
+
+        <div id="mistake-filters" class="mistake-filters" aria-label="错题筛选">
+          <button type="button" data-filter="all">全部</button>
+          <button class="active" type="button" data-filter="due">待复习</button>
+          <button type="button" data-filter="reviewing">复习中</button>
+          <button type="button" data-filter="mastered">已掌握</button>
+          <button type="button" data-filter="hash">哈希表</button>
+          <button type="button" data-filter="pointer">双指针</button>
+        </div>
+
+        <div id="mistake-book-list" class="mistake-book-list"></div>
+        <div id="mistake-pagination" class="mistake-pagination hidden" aria-label="错题分页">
+          <button id="mistake-prev-page" type="button">上一页</button>
+          <span id="mistake-page-info"></span>
+          <button id="mistake-next-page" type="button">下一页</button>
+        </div>
+        <section id="mistake-detail" class="mistake-detail hidden" aria-live="polite"></section>
+      </section>
+
+      <section id="chat-area" class="chat-area">
+        <div class="chat-toolbar">
+          <div class="chat-heading"><strong id="session-title">新对话</strong><span id="active-agent">多 Agent 对话</span></div>
+          <div class="chat-actions">
+            <button id="history-chat-button" class="text-button" type="button">历史</button>
+            <button id="new-chat-button" class="text-button" type="button">＋ 新对话</button>
+          </div>
+        </div>
+        <div id="session-notice" class="session-notice hidden" role="status"></div>
+        <button id="load-older-messages" class="text-button older-messages hidden" type="button">加载更早消息</button>
+        <div id="message-list" class="message-list" aria-live="polite"></div>
+      <div id="quick-prompts" class="quick-prompts" aria-label="下一步问题建议" aria-busy="false">
+          <button>帮我分析解题思路</button>
+          <button>检查我的代码问题</button>
+          <button>提示一个关键点</button>
+        </div>
+      </section>
+
+      <footer class="composer">
+        <section id="session-drawer" class="session-drawer hidden" aria-label="历史对话">
+          <div class="session-drawer-heading"><strong>历史对话</strong>
+            <div><button id="session-refresh" class="text-button" type="button">刷新</button><button id="close-session-drawer" class="icon-button" type="button" aria-label="关闭历史对话">×</button></div>
+          </div>
+          <p class="session-drawer-tip">同一个对话可以讨论多道题。删除不会清除长期记忆或错题。</p>
+          <div id="session-list" class="session-list"></div>
+          <button id="session-list-more" class="text-button hidden" type="button">加载更多对话</button>
+        </section>
+        <label class="attach-code">
+          <input id="include-code" type="checkbox" checked />
+          提问时附带当前代码
+        </label>
+        <div class="input-row">
+          <textarea id="message-input" rows="3" placeholder="针对当前题目提问…"></textarea>
+          <button id="send-button" class="send-button" title="发送">➤</button>
+        </div>
+        <div id="composer-hint" class="composer-hint">Enter 发送，Shift + Enter 换行</div>
+      </footer>
+    </main>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

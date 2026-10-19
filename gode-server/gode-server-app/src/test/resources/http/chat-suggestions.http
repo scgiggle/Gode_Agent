@@ -1,0 +1,48 @@
+@baseUrl = http://localhost:8091/api/v1
+@agentId = demo-agent
+@userId = extension-test
+@sessionId = suggestion-interface-test
+
+### 下一步推荐（会调用真实模型；启动包含新 Controller 的后端后手动运行）
+POST {{baseUrl}}/chat/suggestions
+Content-Type: application/json
+
+{
+  "agentId": "{{agentId}}",
+  "userId": "{{userId}}",
+  "sessionId": "{{sessionId}}",
+  "problemSlug": "two-sum",
+  "problemTitle": "两数之和",
+  "messages": [
+    { "role": "user", "content": "为什么我的两数之和返回了 [0,0]？" },
+    { "role": "assistant", "content": "因为先插入当前元素后查补数，可能与自己匹配。应先查询，再插入。" }
+  ]
+}
+
+> {%
+  client.test("推荐接口成功", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.code === "0000", response.body.info);
+  });
+  client.test("返回三个不同建议", function () {
+    const items = response.body.data;
+    client.assert(Array.isArray(items) && items.length === 3);
+    client.assert(new Set(items.map(item => item.label)).size === 3);
+    client.assert(new Set(items.map(item => item.prompt)).size === 3);
+    client.assert(items.every(item => typeof item.label === "string" && item.label.trim()
+      && typeof item.prompt === "string" && item.prompt.trim()));
+  });
+%}
+
+### 参数校验（不调用模型，可先确认新接口已加载；应返回 code=0002）
+POST {{baseUrl}}/chat/suggestions
+Content-Type: application/json
+
+{}
+
+> {%
+  client.test("请求参数不完整", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.code === "0002");
+  });
+%}

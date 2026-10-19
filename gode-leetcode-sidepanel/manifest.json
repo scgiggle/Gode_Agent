@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Gode AI 力扣侧边栏",
+  "version": "1.0.0",
+  "description": "在力扣题目页面打开 Gode 多 Agent 对话侧边栏。",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://leetcode.cn/*",
+    "http://localhost:8091/*",
+    "http://127.0.0.1:8091/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "打开 Gode AI 侧边栏"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.cn/problems/*"],
+      "js": ["submission-observer.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://leetcode.cn/problems/*"
+      ],
+      "js": [
+        "leetcode-content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "page-bridge.js"
+      ],
+      "matches": [
+        "https://leetcode.cn/*"
+      ]
+    }
+  ]
+}

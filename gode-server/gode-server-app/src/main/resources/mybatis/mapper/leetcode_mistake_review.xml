@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gode.infrastructure.dao.ILeetcodeMistakeReviewDao">
+
+    <resultMap id="LeetcodeMistakeReviewMap" type="com.gode.infrastructure.dao.po.LeetcodeMistakeReviewPO">
+        <id column="id" property="id"/>
+        <result column="mistake_id" property="mistakeId"/>
+        <result column="fail_reason" property="failReason"/>
+        <result column="fail_case" property="failCase"/>
+        <result column="ai_analysis" property="aiAnalysis"/>
+        <result column="action_plan" property="actionPlan"/>
+        <result column="source_session_id" property="sourceSessionId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="ReviewColumns">
+        id, mistake_id, fail_reason, fail_case, ai_analysis,
+        action_plan, source_session_id, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.gode.infrastructure.dao.po.LeetcodeMistakeReviewPO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO leetcode_mistake_review (
+            mistake_id, fail_reason, fail_case, ai_analysis,
+            action_plan, source_session_id
+        ) VALUES (
+            #{mistakeId}, #{failReason}, #{failCase}, #{aiAnalysis},
+            #{actionPlan}, #{sourceSessionId}
+        )
+    </insert>
+
+    <select id="queryLatestByMistakeId" resultMap="LeetcodeMistakeReviewMap">
+        SELECT <include refid="ReviewColumns"/>
+        FROM leetcode_mistake_review
+        WHERE mistake_id = #{mistakeId}
+        ORDER BY created_at DESC, id DESC
+        LIMIT 1
+    </select>
+
+    <select id="queryListByMistakeId" resultMap="LeetcodeMistakeReviewMap">
+        SELECT <include refid="ReviewColumns"/>
+        FROM leetcode_mistake_review
+        WHERE mistake_id = #{mistakeId}
+        ORDER BY created_at DESC, id DESC
+    </select>
+
+    <select id="queryLearningReviews" resultMap="LeetcodeMistakeReviewMap">
+        SELECT review.id, review.mistake_id, review.fail_reason, review.fail_case,
+               review.ai_analysis, review.action_plan, review.source_session_id, review.created_at
+        FROM leetcode_mistake_review AS review
+        INNER JOIN leetcode_mistake AS mistake ON mistake.id = review.mistake_id
+        WHERE mistake.user_id = #{userId}
+        <choose>
+            <when test="mistakeIds != null and mistakeIds.size() > 0">
+                AND mistake.id IN
+                <foreach collection="mistakeIds" item="mistakeId" open="(" separator="," close=")">#{mistakeId}</foreach>
+            </when>
+            <otherwise>AND 1 = 0</otherwise>
+        </choose>
+        ORDER BY review.created_at DESC, review.id DESC LIMIT #{limit}
+    </select>
+
+    <delete id="deleteByMistakeIdAndUserId">
+        DELETE review FROM leetcode_mistake_review AS review
+        INNER JOIN leetcode_mistake AS mistake ON mistake.id = review.mistake_id
+        WHERE review.mistake_id = #{mistakeId} AND mistake.user_id = #{userId}
+    </delete>
+
+</mapper>

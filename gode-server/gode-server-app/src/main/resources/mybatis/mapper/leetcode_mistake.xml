@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gode.infrastructure.dao.ILeetcodeMistakeDao">
+
+    <resultMap id="LeetcodeMistakeMap" type="com.gode.infrastructure.dao.po.LeetcodeMistakePO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="problem_slug" property="problemSlug"/>
+        <result column="title" property="title"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="error_summary" property="errorSummary"/>
+        <result column="tags" property="tags"/>
+        <result column="status" property="status"/>
+        <result column="next_review_time" property="nextReviewTime"/>
+        <result column="review_count" property="reviewCount"/>
+        <result column="source_session_id" property="sourceSessionId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="MistakeColumns">
+        id, user_id, problem_id, problem_slug, title, difficulty,
+        error_summary, tags, status, next_review_time, review_count,
+        source_session_id, created_at, updated_at
+    </sql>
+
+    <sql id="MistakeFilters">
+        <where>
+            user_id = #{userId}
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="tag != null and tag != ''">
+                AND FIND_IN_SET(#{tag}, REPLACE(tags, ', ', ',')) > 0
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    problem_id LIKE CONCAT('%', #{keyword}, '%')
+                    OR title LIKE CONCAT('%', #{keyword}, '%')
+                    OR tags LIKE CONCAT('%', #{keyword}, '%')
+                    OR error_summary LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryByUserAndProblemId" resultMap="LeetcodeMistakeMap">
+        SELECT <include refid="MistakeColumns"/>
+        FROM leetcode_mistake
+        WHERE user_id = #{userId} AND problem_id = #{problemId}
+        LIMIT 1
+    </select>
+
+    <select id="queryByIdAndUserId" resultMap="LeetcodeMistakeMap">
+        SELECT <include refid="MistakeColumns"/>
+        FROM leetcode_mistake
+        WHERE id = #{id} AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.gode.infrastructure.dao.po.LeetcodeMistakePO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO leetcode_mistake (
+            user_id, problem_id, problem_slug, title, difficulty,
+            error_summary, tags, status, next_review_time, review_count,
+            source_session_id
+        ) VALUES (
+            #{userId}, #{problemId}, #{problemSlug}, #{title}, #{difficulty},
+            #{errorSummary}, #{tags}, #{status}, #{nextReviewTime}, #{reviewCount},
+            #{sourceSessionId}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.gode.infrastructure.dao.po.LeetcodeMistakePO">
+        UPDATE leetcode_mistake
+        SET problem_slug = #{problemSlug},
+            title = #{title},
+            difficulty = #{difficulty},
+            error_summary = #{errorSummary},
+            tags = #{tags},
+            status = #{status},
+            next_review_time = #{nextReviewTime},
+            review_count = #{reviewCount},
+            source_session_id = #{sourceSessionId}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteByIdAndUserId">
+        DELETE FROM leetcode_mistake
+        WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+    <select id="queryPage" resultMap="LeetcodeMistakeMap">
+        SELECT <include refid="MistakeColumns"/>
+        FROM leetcode_mistake
+        <include refid="MistakeFilters"/>
+        ORDER BY CASE status
+            WHEN '待复习' THEN 0
+            WHEN '复习中' THEN 1
+            WHEN '已掌握' THEN 2
+            ELSE 3
+        END,
+        next_review_time IS NULL,
+        next_review_time ASC,
+        updated_at DESC,
+        id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*)
+        FROM leetcode_mistake
+        <include refid="MistakeFilters"/>
+    </select>
+
+    <select id="queryRecentLearningMistakes" resultMap="LeetcodeMistakeMap">
+        SELECT <include refid="MistakeColumns"/>
+        FROM leetcode_mistake WHERE user_id = #{userId}
+        ORDER BY updated_at DESC, id DESC LIMIT #{limit}
+    </select>
+
+    <select id="queryByUserAndProblemSlugs" resultMap="LeetcodeMistakeMap">
+        SELECT <include refid="MistakeColumns"/>
+        FROM leetcode_mistake WHERE user_id = #{userId}
+        <choose>
+            <when test="problemSlugs != null and problemSlugs.size() > 0">
+                AND problem_slug IN
+                <foreach collection="problemSlugs" item="slug" open="(" separator="," close=")">#{slug}</foreach>
+            </when>
+            <otherwise>AND 1 = 0</otherwise>
+        </choose>
+        ORDER BY updated_at DESC, id DESC
+    </select>
+
+</mapper>

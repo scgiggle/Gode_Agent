@@ -1,0 +1,107 @@
+# Publish the current server, shared framework, side-panel extension and docs.
+# Everything else at the repository root stays local (old clients, ZIPs).
+/*
+!/.gitignore
+!/README.md
+!/gode-server/
+!/gode-wrench/
+!/gode-leetcode-sidepanel/
+!/docs/
+
+# Java / Maven / Gradle build output
+target/
+build/
+out/
+.gradle/
+.m2/
+*.class
+*.jar
+*.war
+*.ear
+*.hprof
+hs_err_pid*
+replay_pid*
+# Keep the Maven wrapper binary if one is added to the source tree.
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# Front-end dependencies, generated bundles and test output
+node_modules/
+dist/
+coverage/
+.cache/
+.parcel-cache/
+.vite/
+.turbo/
+playwright-report/
+test-results/
+
+# Local IDE / OS files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Runtime logs, caches, databases and temporary files
+logs/
+log/
+tmp/
+temp/
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Local environment variables and credentials (never publish real secrets).
+.env
+.env.*
+!/gode-server/**/.env.example
+!/gode-server/**/.env.template
+!/gode-wrench/**/.env.example
+!/gode-wrench/**/.env.template
+!/gode-leetcode-sidepanel/**/.env.example
+!/gode-leetcode-sidepanel/**/.env.template
+.npmrc
+settings.xml
+application-local.yml
+application-local.yaml
+application-local.properties
+application-*.local.yml
+application-*.local.yaml
+application-*.local.properties
+cookies.json
+cookies.txt
+cookie.txt
+credentials.json
+secrets.json
+secrets.yml
+secrets.yaml
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Release packages are built separately from version-controlled source.
+*.zip
+*.crx
+*.exe
+*.msi
+# Keep only the root README in version control.
+[Rr][Ee][Aa][Dd][Mm][Ee]*
+!/README.md
+
+# Local deployment configuration and artifacts.
+/gode-server/deploy/
