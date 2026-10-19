@@ -36,7 +36,7 @@ Gode 将 AI 对话、代码检查、错题复盘和练习推荐放在力扣网�
 gode/
 ├─ .gitignore                # Git 忽略规则
 ├─ README.md                 # 项目介绍与使用说明
-├─ LICENSE                   # PolyForm Noncommercial 1.0.0 许可证
+├─ LICENSE                   # MIT 许可证
 ├─ gode-leetcode-sidepanel/   # 浏览器侧边栏插件，当前主要使用入口
 ├─ gode-server/               # Java 后端，负责模型调用、工具编排和数据保存
 │  ├─ gode-server-app/        # Spring Boot 启动入口、配置及测试
@@ -139,9 +139,7 @@ $env:GODE_PERSONAL_NOTES_ENABLED = 'true'
 
 ## 许可证
 
-本项目采用 [PolyForm Noncommercial 1.0.0](LICENSE) 许可证，允许许可证规定的非商业用途使用、修改和分发。商业用途需另行取得作者授权，具体权限与限制以许可证全文为准。第三方依赖遵循各自的许可证。
-
-Required Notice: Copyright 2026 scgiggle
+本项目采用 [MIT](LICENSE) 许可证，允许使用、修改、分发和商用，复制或分发时须保留版权声明及许可声明。软件按现状提供，不提供担保，具体条款以许可证全文为准。第三方依赖遵循各自的许可证。
 
 ## 学习项目说明
 
